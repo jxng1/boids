@@ -1,0 +1,32 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "C/C++: cl.exe build active file",
+      "type": "shell",
+      "command": "cl.exe",
+      "args": [
+        "-std=c++17",
+        "main.cpp",
+        "-IC:/Libraries/SFML/include",
+        "-LC:/Libraries/SFML/lib",
+        "-lsfml-graphics",
+        "-lsfml-window",
+        "-lsfml-system",
+        "-o",
+        "flock.exe"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "cmake",
+      "label": "CMake: configure",
+      "command": "configure",
+      "problemMatcher": [],
+      "detail": "CMake template configure task"
+    }
+  ]
+}

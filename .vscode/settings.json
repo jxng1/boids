@@ -1,0 +1,27 @@
+{
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+
+  "editor.formatOnSave": true,
+
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+  "C_Cpp.clang_format_formatOnSave": true,
+
+  "C_Cpp.clang_tidy.enabled": true,
+  "C_Cpp.clang_tidy.args": ["--checks=*,-clang-analyzer-alpha*"],
+
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+
+  "prettier.disableLanguages": ["cpp", "c"],
+
+  "C_Cpp.intelliSenseEngine": "default",
+  "C_Cpp.intelliSenseEngineFallback": "Enabled",
+  "C_Cpp.errorSquiggles": "enabled",
+
+  "cmake.sourceDirectory": "${workspaceFolder}",
+  "cmake.configureOnOpen": true
+}
