@@ -37,10 +37,10 @@ bool AIBoid::inFOV(const sf::Vector2f& target, float maxDist, float coneDegrees)
     float ang = std::atan2(to.y, to.x);
 
     float diff = ang - heading;
-    while (diff > 3.14159f) diff -= 6.28318f;
-    while (diff < -3.14159f) diff += 6.28318f;
+    while (diff > PI) diff -= TWO_PI;
+    while (diff < -PI) diff += TWO_PI;
 
-    float half = coneDegrees * 0.5f * 3.14159f / 180.f;
+    float half = coneDegrees * 0.5f * PI / 180.f;
     return std::abs(diff) < half;
 }
 
@@ -132,10 +132,10 @@ void AIBoid::sensePredators(const std::vector<Predator>& preds, float& predDistN
     float ang = std::atan2(closestVec.y, closestVec.x);
     float rel = ang - heading;
 
-    while (rel > 3.14159f) rel -= 6.28318f;
-    while (rel < -3.14159f) rel += 6.28318f;
+    while (rel > PI) rel -= TWO_PI;
+    while (rel < PI) rel += TWO_PI;
 
-    predRelAngle = rel / 3.14159f;  // normalise to [-1, 1]
+    predRelAngle = rel / PI;  // normalise to [-1, 1]
 
     // danger score
     float distDanger = 1.f - predDistNorm;              // [0(far), 1(close)]
@@ -210,7 +210,7 @@ void AIBoid::draw(sf::RenderWindow& window) {
     tri.setPoint(1, sf::Vector2f(-4.f, 6.f));
     tri.setPoint(2, sf::Vector2f(4.f, 6.f));
 
-    float angle = std::atan2(velocity.y, velocity.x) * 180.f / 3.14159f + 90.f;
+    float angle = std::atan2(velocity.y, velocity.x) * 180.f / PI + 90.f;
 
     tri.setPosition(position);
     tri.setRotation(sf::degrees(angle));
@@ -229,7 +229,7 @@ void AIBoid::draw(sf::RenderWindow& window) {
 
     for (int i = 0; i <= seg; i++) {
         float t = -fovDeg / 2 + (fovDeg * i / seg);
-        float ang = heading + t * 3.14159f / 180.f;
+        float ang = heading + t * PI / 180.f;
         cone.setPoint(i + 1, {std::cos(ang) * fovRadius, std::sin(ang) * fovRadius});
     }
 

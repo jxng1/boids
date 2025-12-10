@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdlib>
 
+#include "Globals.hpp"
 #include "Utils.hpp"
 
 // Constructor
@@ -53,7 +54,7 @@ void Boid::draw(sf::RenderWindow& window) {
     triangle.setPoint(1, sf::Vector2f(-4.f, 4.f));  // bottom left
     triangle.setPoint(2, sf::Vector2f(4.f, 4.f));   // bottom right
 
-    float angle = std::atan2(velocity.y, velocity.x) * 180.f / 3.14159f + 90.f;  // orientate
+    float angle = std::atan2(velocity.y, velocity.x) * 180.f / PI + 90.f;  // orientate
     triangle.setRotation(sf::degrees(angle));
     triangle.setPosition(position);
     triangle.setFillColor(sf::Color::Red);
