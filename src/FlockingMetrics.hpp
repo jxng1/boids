@@ -7,7 +7,7 @@
 #include "Utils.hpp"
 
 struct FlockingMetrics {
-    float averageCohesion = 0.f;   // average distance to neighbors
+    float averageCohesion = 0.f;   // average distance to neighbours
     float averageAlignment = 0.f;  // average alignment [-1, 1]
 };
 
@@ -23,7 +23,7 @@ inline FlockingMetrics computeFlockingMetrics(const std::vector<AIBoid>& boids,
     for (const auto& b : boids) {
         sf::Vector2f avgVel(0.f, 0.f);
         float avgDist = 0.f;
-        int neighbors = 0;
+        int neighbours = 0;
 
         for (const auto& other : boids) {
             if (&b == &other) continue;
@@ -31,14 +31,14 @@ inline FlockingMetrics computeFlockingMetrics(const std::vector<AIBoid>& boids,
             if (d < perceptionRadius) {
                 avgVel += other.velocity;
                 avgDist += d;
-                neighbors++;
+                neighbours++;
             }
         }
 
-        if (neighbors > 0) {
-            avgVel /= static_cast<float>(neighbors);
+        if (neighbours > 0) {
+            avgVel /= static_cast<float>(neighbours);
             avgVel = normalise(avgVel);
-            avgDist /= static_cast<float>(neighbors);
+            avgDist /= static_cast<float>(neighbours);
 
             totalCohesion += avgDist;
             totalAlignment += dot(normalise(b.velocity), avgVel);

@@ -17,8 +17,8 @@ class EvolutionManager {
    public:
     EvolutionManager(const EvolutionConfig& cfg, const NeuralNetwork& templateNet);
 
-    // initialize random population
-    void initialize();
+    // initialise random population
+    void initialise();
 
     // run one generation (simulate externally - manager keeps track of time)
     void update(float dt);

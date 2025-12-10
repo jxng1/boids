@@ -47,8 +47,8 @@ class AIBoid : public Boid {
     NeuralNetwork brain;
 
     // returns: count, avgDir, avgVel, avgDist
-    void senseNeighbors(const std::vector<Boid>& boids, float& countNorm, sf::Vector2f& avgDir,
-                        sf::Vector2f& avgVel, float& distNorm);
+    void senseneighbours(const std::vector<Boid>& boids, float& countNorm, sf::Vector2f& avgDir,
+                         sf::Vector2f& avgVel, float& distNorm);
 
     // returns predator distance normalised + relative angle (-1..1)
     void sensePredators(const std::vector<Predator>& preds, float& predDistNorm,

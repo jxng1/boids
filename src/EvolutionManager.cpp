@@ -18,7 +18,7 @@ EvolutionManager::EvolutionManager(const EvolutionConfig& c, const NeuralNetwork
     m_fitness.resize(cfg.population, 0.f);
 }
 
-void EvolutionManager::initialize() {
+void EvolutionManager::initialise() {
     for (auto& net : m_pool) {
         net.mutate(0.5f, 1.0f);  // randomize initial population
     }

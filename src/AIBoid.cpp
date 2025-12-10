@@ -44,8 +44,8 @@ bool AIBoid::inFOV(const sf::Vector2f& target, float maxDist, float coneDegrees)
     return std::abs(diff) < half;
 }
 
-void AIBoid::senseNeighbors(const std::vector<Boid>& boids, float& countNorm, sf::Vector2f& avgDir,
-                            sf::Vector2f& avgVel, float& distNorm) {
+void AIBoid::senseneighbours(const std::vector<Boid>& boids, float& countNorm, sf::Vector2f& avgDir,
+                             sf::Vector2f& avgVel, float& distNorm) {
     int count = 0;
     sf::Vector2f sumDir(0.f, 0.f);
     sf::Vector2f sumVel(0.f, 0.f);
@@ -160,7 +160,7 @@ float AIBoid::angleBetweenRadians(const sf::Vector2f& a, const sf::Vector2f& b) 
 void AIBoid::think(const std::vector<Boid>& boids, const std::vector<Predator>& preds, float dt) {
     float countNorm, distNorm;
     sf::Vector2f avgDir, avgVel;
-    senseNeighbors(boids, countNorm, avgDir, avgVel, distNorm);
+    senseneighbours(boids, countNorm, avgDir, avgVel, distNorm);
 
     float predDistNorm, predRelAngle;
     sensePredators(preds, predDistNorm, predRelAngle);

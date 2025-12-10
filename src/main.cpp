@@ -17,7 +17,7 @@ int main() {
     cfg.generationTime = 15.f;
     NeuralNetwork candidate({10, 12, 2});
     EvolutionManager evo(cfg, candidate);
-    evo.initialize();
+    evo.initialise();
 
     auto boids = evo.producePopulation();
 
