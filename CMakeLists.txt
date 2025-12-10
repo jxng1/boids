@@ -14,7 +14,7 @@ FetchContent_Declare(SFML
 FetchContent_MakeAvailable(SFML)
 
 # Only include cpp files
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES "src/*.cpp" "src/*.hpp")
 add_executable(boids ${SOURCES})
 
 # Link all required SFML components

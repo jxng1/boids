@@ -22,9 +22,6 @@ class Boid {
     void draw(sf::RenderWindow& window);
 
    private:
-    // Helper functions
-    static float mag(const sf::Vector2f& v);
-    static sf::Vector2f normalize(const sf::Vector2f& v);
     static sf::Vector2f limit(const sf::Vector2f& v, float max);
     bool inFov(const Boid& other) const;
 

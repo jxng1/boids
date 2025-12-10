@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstdlib>
 
+#include "Utils.hpp"
+
 // Constructor
 Boid::Boid(float x, float y) {
     position = sf::Vector2f(x, y);
@@ -59,17 +61,6 @@ void Boid::draw(sf::RenderWindow& window) {
     window.draw(triangle);
 }
 
-// Helper functions
-float Boid::mag(const sf::Vector2f& v) {
-    return std::sqrt(v.x * v.x + v.y * v.y);
-}
-
-sf::Vector2f Boid::normalize(const sf::Vector2f& v) {
-    float m = mag(v);
-    if (m == 0) return sf::Vector2f(0, 0);
-    return sf::Vector2f(v.x / m, v.y / m);
-}
-
 sf::Vector2f Boid::limit(const sf::Vector2f& v, float max) {
     float m = mag(v);
     if (m > max) return sf::Vector2f(v.x / m * max, v.y / m * max);
@@ -91,7 +82,7 @@ sf::Vector2f Boid::align(const std::vector<Boid>& boids) const {
 
     if (total > 0) {
         steering /= (float)total;
-        steering = normalize(steering) * maxSpeed;
+        steering = normalise(steering) * maxSpeed;
         steering -= velocity;
         steering = limit(steering, maxForce);
     }
@@ -115,7 +106,7 @@ sf::Vector2f Boid::cohesion(const std::vector<Boid>& boids) const {
     if (total > 0) {
         steering /= (float)total;
         steering -= position;
-        steering = normalize(steering) * maxSpeed;
+        steering = normalise(steering) * maxSpeed;
         steering -= velocity;
         steering = limit(steering, maxForce);
     }
@@ -140,7 +131,7 @@ sf::Vector2f Boid::separation(const std::vector<Boid>& boids) const {
 
     if (total > 0) {
         steering /= (float)total;
-        steering = normalize(steering) * maxSpeed;
+        steering = normalise(steering) * maxSpeed;
         steering -= velocity;
         steering = limit(steering, maxForce);
     }
