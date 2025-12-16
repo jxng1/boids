@@ -7,10 +7,13 @@
 #include "FlockingMetrics.hpp"
 #include "Globals.hpp"
 #include "Predator.hpp"
+#include "imgui-SFML.h"
+#include "imgui.h"
 
 int main() {
     sf::RenderWindow window(sf::VideoMode({g_WIDTH, g_HEIGHT}), "Boids", sf::State::Fullscreen);
     window.setFramerateLimit(60);
+    if (ImGui::SFML::Init(window)) std::cout << "ImGui initialised successfully..." << std::endl;
 
     EvolutionConfig cfg;
     cfg.population = 80;
@@ -27,7 +30,9 @@ int main() {
     sf::Clock clock;
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
-        while (const std::optional event = window.pollEvent()) {
+        while (const auto event = window.pollEvent()) {
+            ImGui::SFML::ProcessEvent(window, *event);
+
             if (event->is<sf::Event::KeyPressed>() &&
                 sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
                 g_drawFOV = !g_drawFOV;
@@ -36,6 +41,9 @@ int main() {
                 window.close();
             }
         }
+
+        ImGui::SFML::Update(window, clock.getElapsedTime());
+        ImGui::ShowDemoWindow();
 
         evo.update(dt);
         for (size_t i = 0; i < boids.size(); i++) {
@@ -61,8 +69,12 @@ int main() {
 
         window.clear(sf::Color::Black);
         for (auto& b : boids) b.draw(window);
+
+        ImGui::SFML::Render(window);
         window.display();
     }
+
+    ImGui::SFML::Shutdown();
 
     return 0;
 }

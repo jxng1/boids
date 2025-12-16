@@ -6,7 +6,6 @@
 #include "Globals.hpp"
 #include "Utils.hpp"
 
-// Constructor
 Boid::Boid(float x, float y) {
     position = sf::Vector2f(x, y);
     velocity =

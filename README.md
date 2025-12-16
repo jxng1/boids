@@ -1,6 +1,6 @@
 # Boids
 
-~Very, very~ Somewhat simplistic C++ Boids w/ NN implementation to understand flocking behaviour.
+Simplistic C++ Boids w/ NN implementation to understand flocking behaviour.
 
 ## To Build & Run
 

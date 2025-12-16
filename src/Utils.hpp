@@ -9,19 +9,19 @@ inline float distance(const sf::Vector2f& a, const sf::Vector2f& b) {
     return std::sqrt(dx * dx + dy * dy);
 }
 
-// normalise a vector
+// Magnitude of a vector
+inline float mag(const sf::Vector2f& v) {
+    return std::sqrt(v.x * v.x + v.y * v.y);
+}
+
+// Normalise a vector
 inline sf::Vector2f normalise(const sf::Vector2f& v) {
-    float mag = std::sqrt(v.x * v.x + v.y * v.y);
-    if (mag == 0.f) return sf::Vector2f(0.f, 0.f);
-    return v / mag;
+    float l = mag(v);
+    if (l == 0.f) return sf::Vector2f(0.f, 0.f);
+    return v / l;
 }
 
 // Dot product of two vectors
 inline float dot(const sf::Vector2f& a, const sf::Vector2f& b) {
     return a.x * b.x + a.y * b.y;
-}
-
-// Magnitude of a vector
-inline float mag(const sf::Vector2f& v) {
-    return std::sqrt(v.x * v.x + v.y * v.y);
 }

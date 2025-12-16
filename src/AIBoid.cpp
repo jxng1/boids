@@ -7,8 +7,6 @@
 
 AIBoid::AIBoid(float x, float y, NeuralNetwork brainTemplate)
     : Boid(x, y), brain(std::move(brainTemplate)) {
-    float vx = velocity.x, vy = velocity.y;
-    float m = std::sqrt(vx * vx + vy * vy);
 }
 
 float AIBoid::computeFitness() const {
@@ -30,7 +28,7 @@ float AIBoid::computeFitness() const {
 
 bool AIBoid::inFOV(const sf::Vector2f& target, float maxDist, float coneDegrees) const {
     sf::Vector2f to = target - position;
-    float dist = std::sqrt(to.x * to.x + to.y * to.y);
+    float dist = mag(to);
     if (dist > maxDist) return false;
 
     float heading = std::atan2(velocity.y, velocity.x);
@@ -44,12 +42,14 @@ bool AIBoid::inFOV(const sf::Vector2f& target, float maxDist, float coneDegrees)
     return std::abs(diff) < half;
 }
 
-void AIBoid::senseneighbours(const std::vector<Boid>& boids, float& countNorm, sf::Vector2f& avgDir,
+void AIBoid::senseNeighbours(const std::vector<Boid>& boids, float& countNorm, sf::Vector2f& avgDir,
                              sf::Vector2f& avgVel, float& distNorm) {
     int count = 0;
     sf::Vector2f sumDir(0.f, 0.f);
     sf::Vector2f sumVel(0.f, 0.f);
     float totalDist = 0.f;
+
+    float collisionThreshold = 0.1f * fovRadius;
 
     for (const Boid& other : boids) {
         if (&other == this) continue;
@@ -57,12 +57,17 @@ void AIBoid::senseneighbours(const std::vector<Boid>& boids, float& countNorm, s
         if (!inFOV(other.position, fovRadius, fovDeg)) continue;
 
         sf::Vector2f d = other.position - position;
-        float dist = std::sqrt(d.x * d.x + d.y * d.y);
+        float dist = mag(d);
 
         sumDir += d;
         sumVel += other.velocity;
         totalDist += dist;
         count++;
+
+        // penalise boids "colliding" into one another based on distance
+        if (dist < collisionThreshold) {
+            dangerScore += (collisionThreshold - dist) / collisionThreshold;  // [0, 1]
+        }
     }
 
     if (count > 0) {
@@ -73,10 +78,6 @@ void AIBoid::senseneighbours(const std::vector<Boid>& boids, float& countNorm, s
         avgDir = {0.f, 0.f};
         avgVel = {0.f, 0.f};
         distNorm = 1.f;
-
-        perceptionScore += 0.f;
-        cohesionScore += 0.f;
-        alignmentScore += 0.f;
 
         return;
     }
@@ -90,7 +91,7 @@ void AIBoid::senseneighbours(const std::vector<Boid>& boids, float& countNorm, s
     cohesionScore += cohesion;
 
     float alignment = 0.f;
-    if (avgVel.length() > 0.0001f && velocity.length() > 0.0001f) {
+    if (mag(avgVel) > 0.0001f && mag(velocity) > 0.0001f) {
         sf::Vector2 nv = normalise(velocity);
         sf::Vector2 nav = normalise(avgVel);
         float dotv = dot(nv, nav);        // [-1, 1]
@@ -109,7 +110,7 @@ void AIBoid::sensePredators(const std::vector<Predator>& preds, float& predDistN
         if (!inFOV(p.position, predatorFOVRadius, predatorFOVDeg)) continue;
 
         sf::Vector2f d = p.position - position;
-        float dist = std::sqrt(d.x * d.x + d.y * d.y);
+        float dist = mag(d);
         if (dist < closest) {
             closest = dist;
             closestVec = d;
@@ -149,8 +150,8 @@ void AIBoid::sensePredators(const std::vector<Predator>& preds, float& predDistN
 }
 
 float AIBoid::angleBetweenRadians(const sf::Vector2f& a, const sf::Vector2f& b) const {
-    float al = std::sqrt(a.x * a.x + a.y * a.y);
-    float bl = std::sqrt(b.x * b.x + b.y * b.y);
+    float al = mag(a);
+    float bl = mag(b);
     if (al < 1e-6f || bl < 1e-6f) return 0.f;
     float dot = (a.x * b.x + a.y * b.y) / (al * bl);
     dot = std::max(-1.0f, std::min(1.0f, dot));
@@ -160,7 +161,7 @@ float AIBoid::angleBetweenRadians(const sf::Vector2f& a, const sf::Vector2f& b) 
 void AIBoid::think(const std::vector<Boid>& boids, const std::vector<Predator>& preds, float dt) {
     float countNorm, distNorm;
     sf::Vector2f avgDir, avgVel;
-    senseneighbours(boids, countNorm, avgDir, avgVel, distNorm);
+    senseNeighbours(boids, countNorm, avgDir, avgVel, distNorm);
 
     float predDistNorm, predRelAngle;
     sensePredators(preds, predDistNorm, predRelAngle);
@@ -180,7 +181,7 @@ void AIBoid::think(const std::vector<Boid>& boids, const std::vector<Predator>& 
     float localVelForward = avgVel.x * forward.x + avgVel.y * forward.y;  // vel forward
     float localVelRight = avgVel.x * right.x + avgVel.y * right.y;        // vel right
 
-    float speedNorm = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y) / maxSpeed;
+    float speedNorm = mag(velocity) / maxSpeed;
 
     // ------ Neural Network Inputs ------
     std::vector<float> inputs = {
@@ -195,11 +196,33 @@ void AIBoid::think(const std::vector<Boid>& boids, const std::vector<Predator>& 
         predRelAngle,     // 8: predRelAngle
         1.f               // 9 bias
     };
-
     auto out = brain.feedForward(inputs);
+
+    // Normalise steer
     sf::Vector2f steer(out[0], out[1]);
+    if (mag(steer) > 1.f) steer = normalise(steer);
 
     Boid::applyForce(steer * maxForce);
+
+    // Clamp rotation to stop 360 spins
+    float speed = mag(velocity);
+    if (speed > 1e-5f) {
+        float currentAngle = std::atan2(forward.y, forward.x);
+        float newAngle = std::atan2(velocity.y, velocity.x);
+
+        float delta = newAngle - currentAngle;
+
+        // wrap to [-pi, pi]
+        while (delta > PI) delta -= TWO_PI;
+        while (delta < -PI) delta += TWO_PI;
+
+        float maxTurnRad = g_aiBoidConfig.maxTurnDeg * PI / 180.f * dt;
+        delta = std::clamp(delta, -maxTurnRad, maxTurnRad);
+
+        float clampedAngle = currentAngle + delta;
+        velocity.x = std::cos(clampedAngle) * speed;
+        velocity.y = std::sin(clampedAngle) * speed;
+    }
 }
 
 void AIBoid::draw(sf::RenderWindow& window) {
